@@ -1342,29 +1342,38 @@ export default function ManagerPortal() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-background p-8 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <main className="min-h-screen bg-[#fcfcfc] p-8 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-background p-8">
-      <div className="max-w-6xl mx-auto">
+    <main className="min-h-screen bg-[#fcfcfc] p-8 relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute top-[-10%] left-[-5%] w-[35%] h-[35%] rounded-full bg-blue-100/40 blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-5%] w-[35%] h-[35%] rounded-full bg-indigo-100/40 blur-[100px] pointer-events-none" />
+
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Manager Dashboard</h1>
-            <p className="text-muted-foreground mt-2">Assign niches and cities to your callers</p>
+        <div className="mb-12 space-y-4">
+          <div className="inline-flex items-center justify-center px-3 py-1 mb-4 rounded-full bg-white border border-gray-200 shadow-sm">
+            <span className="text-xs font-semibold tracking-wide text-gray-600 uppercase">Manager Dashboard</span>
           </div>
-          <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
-            <LogOut className="w-4 h-4" />
-            Logout
-          </Button>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1">
+              <h1 className="text-4xl font-bold text-gray-900">Manager Dashboard</h1>
+              <p className="text-gray-500 mt-2 text-lg">Assign niches and cities to your callers</p>
+            </div>
+            <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2 rounded-xl h-11 px-4 border-gray-200 hover:bg-gray-50 transition-colors">
+              <LogOut className="w-4 h-4" />
+              Logout
+            </Button>
+          </div>
         </div>
 
         {/* Summary Cards - 5 Metrics + 4 Lead Status Metrics in Multiple Rows */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
           <Card className="bg-white border border-border shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="pt-3 pb-3 px-4 text-center">
               <p className="text-xs font-medium text-muted-foreground mb-1">Cities Pending</p>

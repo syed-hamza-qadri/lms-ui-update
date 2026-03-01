@@ -538,44 +538,52 @@ export default function LeadGenerator() {
     : actionedLeads
 
   return (
-    <main className="min-h-screen bg-background p-8">
-      <div className="max-w-6xl mx-auto">
+    <main className="min-h-screen bg-[#fcfcfc] p-8 relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute top-[-10%] left-[-5%] w-[35%] h-[35%] rounded-full bg-blue-100/40 blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-5%] w-[35%] h-[35%] rounded-full bg-indigo-100/40 blur-[100px] pointer-events-none" />
+      
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
-        <div className="flex items-center justify-between gap-4 mb-8">
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-foreground">Lead Generator</h1>
-            <p className="text-muted-foreground mt-2">Create and manage leads across niches and cities</p>
+        <div className="mb-12 space-y-4">
+          <div className="inline-flex items-center justify-center px-3 py-1 mb-4 rounded-full bg-white border border-gray-200 shadow-sm">
+            <span className="text-xs font-semibold tracking-wide text-gray-600 uppercase">Lead Generator</span>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={handleReloadTabs} disabled={reloading} className="flex items-center gap-2">
-              <RefreshCw className={`w-4 h-4 ${reloading ? 'animate-spin' : ''}`} />
-              Reload
-            </Button>
-            <Button variant="outline" onClick={() => setPerformanceOpen(true)} className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4" />
-              Status
-            </Button>
-            <Dialog open={openDialog} onOpenChange={(open) => {
-              setOpenDialog(open)
-              if (!open) resetForm()
-            }}>
-              <DialogTrigger asChild>
-                <Button className="flex items-center gap-2">
-                  <Plus className="w-4 h-4" />
-                  New Lead
-                </Button>
-              </DialogTrigger>
-            <DialogContent className="max-w-md">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1">
+              <h1 className="text-4xl font-bold text-gray-900">Lead Generator</h1>
+              <p className="text-gray-500 mt-2 text-lg">Create and manage leads across niches and cities</p>
+            </div>
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={handleReloadTabs} disabled={reloading} className="flex items-center gap-2 rounded-xl h-11 px-4 border-gray-200 hover:bg-gray-50 transition-colors">
+                <RefreshCw className={`w-4 h-4 ${reloading ? 'animate-spin' : ''}`} />
+                Reload
+              </Button>
+              <Button variant="outline" onClick={() => setPerformanceOpen(true)} className="flex items-center gap-2 rounded-xl h-11 px-4 border-gray-200 hover:bg-gray-50 transition-colors">
+                <BarChart3 className="w-4 h-4" />
+                Status
+              </Button>
+              <Dialog open={openDialog} onOpenChange={(open) => {
+                setOpenDialog(open)
+                if (!open) resetForm()
+              }}>
+                <DialogTrigger asChild>
+                  <Button className="flex items-center gap-2 rounded-xl h-11 px-4 bg-blue-600 hover:bg-blue-700 text-white transition-colors">
+                    <Plus className="w-4 h-4" />
+                    New Lead
+                  </Button>
+                </DialogTrigger>
+            <DialogContent className="max-w-md rounded-2xl">
               <DialogHeader>
-                <DialogTitle>{isEditing ? 'Edit Lead' : 'Add New Lead'}</DialogTitle>
-                <DialogDescription>{isEditing ? 'Update lead information' : 'Create a new lead'}</DialogDescription>
+                <DialogTitle className="text-2xl font-bold text-gray-900">{isEditing ? 'Edit Lead' : 'Add New Lead'}</DialogTitle>
+                <DialogDescription className="text-gray-500">{isEditing ? 'Update lead information' : 'Create a new lead'}</DialogDescription>
               </DialogHeader>
 
-              <form onSubmit={handleAddLead} className="space-y-4">
+              <form onSubmit={handleAddLead} className="space-y-5">
                 <div>
-                  <Label htmlFor="niche" className="mb-2 block">Niche</Label>
+                  <Label htmlFor="niche" className="mb-2 block text-sm font-semibold text-gray-700">Niche</Label>
                   <Select value={selectedNiche} onValueChange={setSelectedNiche}>
-                    <SelectTrigger id="niche">
+                    <SelectTrigger id="niche" className="h-11 rounded-lg border-gray-200">
                       <SelectValue placeholder="Select a niche" />
                     </SelectTrigger>
                     <SelectContent>
@@ -589,9 +597,9 @@ export default function LeadGenerator() {
                 </div>
 
                 <div>
-                  <Label htmlFor="city" className="mb-2 block">City</Label>
+                  <Label htmlFor="city" className="mb-2 block text-sm font-semibold text-gray-700">City</Label>
                   <Select value={selectedCity} onValueChange={setSelectedCity} disabled={!selectedNiche}>
-                    <SelectTrigger id="city">
+                    <SelectTrigger id="city" className="h-11 rounded-lg border-gray-200">
                       <SelectValue placeholder="Select a city" />
                     </SelectTrigger>
                     <SelectContent>
@@ -605,17 +613,18 @@ export default function LeadGenerator() {
                 </div>
 
                 <div>
-                  <Label htmlFor="name" className="mb-2 block">Lead Name</Label>
+                  <Label htmlFor="name" className="mb-2 block text-sm font-semibold text-gray-700">Lead Name</Label>
                   <Input
                     id="name"
                     placeholder="e.g., John Doe"
                     value={leadName}
                     onChange={(e) => setLeadName(e.target.value)}
+                    className="h-11 rounded-lg border-gray-200"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="details" className="mb-2 block flex items-center justify-between">
+                  <Label htmlFor="details" className="mb-2 block flex items-center justify-between text-sm font-semibold text-gray-700">
                     <span>Lead Details</span>
                     <span className="text-xs text-muted-foreground">(Double-click to expand)</span>
                   </Label>
@@ -648,7 +657,7 @@ export default function LeadGenerator() {
               </form>
             </DialogContent>
             </Dialog>
-            <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
+            <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2 rounded-xl h-11 px-4 border-gray-200 hover:bg-gray-50 transition-colors">
               <LogOut className="w-4 h-4" />
               Logout
             </Button>
@@ -657,24 +666,24 @@ export default function LeadGenerator() {
 
         {/* Performance Dialog */}
         <Dialog open={performanceOpen} onOpenChange={setPerformanceOpen}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-md rounded-2xl">
             <DialogHeader>
-              <DialogTitle>Your Performance Metrics</DialogTitle>
-              <DialogDescription>Overview of your performance and capacity</DialogDescription>
+              <DialogTitle className="text-2xl font-bold text-gray-900">Your Performance Metrics</DialogTitle>
+              <DialogDescription className="text-gray-500">Overview of your performance and capacity</DialogDescription>
             </DialogHeader>
             
-            <Card className="bg-gradient-to-br from-card to-muted/20">
-              <CardHeader className="pb-1">
-                <CardTitle className="text-base">{session?.user_name}</CardTitle>
+            <Card className="bg-gradient-to-br from-blue-50 to-indigo-50/30 border-blue-100">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-lg text-blue-900">{session?.user_name}</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 text-sm pt-0">
+              <CardContent className="space-y-2 text-sm pt-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Leads Added:</span>
-                  <Badge variant="outline">{performance.added}</Badge>
+                  <span className="text-gray-600 font-medium">Leads Added:</span>
+                  <Badge variant="outline" className="bg-white">{performance.added}</Badge>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-muted-foreground">Approved:</span>
-                  <Badge className="bg-green-100 text-green-700">{performance.approved || 0}</Badge>
+                  <span className="text-gray-600 font-medium">Approved:</span>
+                  <Badge className="bg-green-100 text-green-700 border-green-200">{performance.approved || 0}</Badge>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-muted-foreground">Declined:</span>
@@ -710,16 +719,16 @@ export default function LeadGenerator() {
 
         {/* Tabs Section */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-12">
-          <TabsList className="grid w-full max-w-md grid-cols-3">
-            <TabsTrigger value="unassigned" disabled={reloading} className="flex items-center gap-2">
+          <TabsList className="grid w-full max-w-md grid-cols-3 bg-gray-100/80 p-1 rounded-xl h-11">
+            <TabsTrigger value="unassigned" disabled={reloading} className="flex items-center gap-2 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-blue-600 transition-all">
               New Leads
               {reloading && <Loader2 className="w-4 h-4 animate-spin" />}
             </TabsTrigger>
-            <TabsTrigger value="actioned" disabled={reloading} className="flex items-center gap-2">
+            <TabsTrigger value="actioned" disabled={reloading} className="flex items-center gap-2 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-blue-600 transition-all">
               Actioned Leads
               {reloading && <Loader2 className="w-4 h-4 animate-spin" />}
             </TabsTrigger>
-            <TabsTrigger value="corrections" disabled={reloading} className="flex items-center gap-2">
+            <TabsTrigger value="corrections" disabled={reloading} className="flex items-center gap-2 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-blue-600 transition-all">
               Corrections ({corrections.length})
               {reloading && <Loader2 className="w-4 h-4 animate-spin" />}
             </TabsTrigger>
@@ -727,7 +736,7 @@ export default function LeadGenerator() {
 
           {/* Unassigned Leads Tab */}
           <TabsContent value="unassigned" className="mt-6">
-            <Card>
+            <Card className="border-gray-200 bg-white/80 backdrop-blur-xl rounded-2xl shadow-sm hover:shadow-md transition-shadow"
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <table className="w-full">

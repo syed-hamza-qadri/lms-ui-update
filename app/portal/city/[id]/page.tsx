@@ -383,30 +383,34 @@ export default function LeadList() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-background p-8 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <main className="min-h-screen bg-[#fcfcfc] p-8 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-background p-8">
-      <div className="max-w-4xl mx-auto">
+    <main className="min-h-screen bg-[#fcfcfc] p-8 relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute top-[-10%] left-[-5%] w-[35%] h-[35%] rounded-full bg-blue-100/40 blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-5%] w-[35%] h-[35%] rounded-full bg-indigo-100/40 blur-[100px] pointer-events-none" />
+
+      <div className="max-w-4xl mx-auto relative z-10">
         <div className="flex items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-4">
             <Button
               variant="outline"
               size="sm"
               onClick={() => router.push('/portal/caller')}
-              className="h-10 w-10 p-0"
+              className="h-10 w-10 p-0 rounded-lg border-gray-200 hover:bg-gray-50"
             >
               <ArrowLeft className="w-4 h-4" />
             </Button>
             <div>
-              <h1 className="text-3xl font-bold text-foreground">
+              <h1 className="text-3xl font-bold text-gray-900">
                 {nicheName} in {cityName}
               </h1>
-              <p className="text-muted-foreground mt-2">Manage your leads</p>
+              <p className="text-gray-500 mt-2">Manage your leads</p>
             </div>
           </div>
           <div className="flex gap-2">

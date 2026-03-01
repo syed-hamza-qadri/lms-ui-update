@@ -694,11 +694,11 @@ export default function LeadDetail() {
 
   if (!lead) {
     return (
-      <main className="min-h-screen bg-background p-8">
+      <main className="min-h-screen bg-[#fcfcfc] p-8">
         <div className="max-w-4xl mx-auto">
-          <Card>
+          <Card className="border-gray-200 bg-white/80 backdrop-blur-xl rounded-2xl">
             <CardContent className="text-center py-12">
-              <p className="text-muted-foreground">Lead not found</p>
+              <p className="text-gray-500">Lead not found</p>
             </CardContent>
           </Card>
         </div>
@@ -707,15 +707,19 @@ export default function LeadDetail() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
-      <div className="max-w-5xl mx-auto">
+    <main className="min-h-screen bg-[#fcfcfc] p-8 relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute top-[-10%] left-[-5%] w-[35%] h-[35%] rounded-full bg-blue-100/40 blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-5%] w-[35%] h-[35%] rounded-full bg-indigo-100/40 blur-[100px] pointer-events-none" />
+
+      <div className="max-w-5xl mx-auto relative z-10">
         {/* Header */}
         <div className="mb-8">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => cityId && router.push(`/portal/city/${cityId}`)}
-            className="mb-4 text-muted-foreground hover:text-foreground"
+            className="mb-4 text-gray-500 hover:text-gray-700 hover:bg-gray-100/50"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back

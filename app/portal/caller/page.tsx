@@ -298,21 +298,48 @@ export default function CallerPortal() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-background p-8 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <main className="min-h-screen bg-[#fcfcfc] p-8 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-background p-8">
-      <div className="max-w-6xl mx-auto">
+    <main className="min-h-screen bg-[#fcfcfc] p-8 relative overflow-hidden">
+      {/* Background decorative elements */}
+      <div className="absolute top-[-10%] left-[-5%] w-[35%] h-[35%] rounded-full bg-blue-100/40 blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-[-10%] right-[-5%] w-[35%] h-[35%] rounded-full bg-indigo-100/40 blur-[100px] pointer-events-none" />
+
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-foreground">Your Leads</h1>
-            <p className="text-muted-foreground mt-2">Welcome, {session?.user_name}. Select a niche to view available leads</p>
+        <div className="mb-12 space-y-4">
+          <div className="inline-flex items-center justify-center px-3 py-1 mb-4 rounded-full bg-white border border-gray-200 shadow-sm">
+            <span className="text-xs font-semibold tracking-wide text-gray-600 uppercase">Caller Portal</span>
           </div>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex-1">
+              <h1 className="text-4xl font-bold text-gray-900">Caller Portal</h1>
+              <p className="text-gray-500 mt-2 text-lg">Browse and manage leads across niches and cities</p>
+            </div>
+            <div className="flex gap-3">
+              <Button variant="outline" onClick={() => fetchData()} disabled={refreshing} className="flex items-center gap-2 rounded-xl h-11 px-4 border-gray-200 hover:bg-gray-50 transition-colors">
+                <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+              <Button variant="outline" onClick={() => setPerformanceOpen(true)} className="flex items-center gap-2 rounded-xl h-11 px-4 border-gray-200 hover:bg-gray-50 transition-colors">
+                <BarChart3 className="w-4 h-4" />
+                Performance
+              </Button>
+              <Button variant="outline" onClick={() => {
+                localStorage.removeItem('caller_session')
+                router.push('/portal')
+              }} className="flex items-center gap-2 rounded-xl h-11 px-4 border-gray-200 hover:bg-gray-50 transition-colors">
+                <LogOut className="w-4 h-4" />
+                Logout
+              </Button>
+            </div>
+          </div>
+        </div>
           <div className="flex gap-2">
             <Button 
               variant="outline" 
