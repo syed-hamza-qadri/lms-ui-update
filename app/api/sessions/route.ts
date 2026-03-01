@@ -1,6 +1,5 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+import { getSupabaseServerClient } from '@/lib/supabase-server'
 import { randomUUID } from 'crypto'
 
 export async function POST(request: NextRequest) {
@@ -13,27 +12,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
-          } catch {
-            // Ignored
-          }
-        },
-      },
-    }
-  )
+  const supabase = await getSupabaseServerClient()
 
   try {
     // Generate token
@@ -80,27 +59,7 @@ export async function DELETE(request: NextRequest) {
     )
   }
 
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
-          } catch {
-            // Ignored
-          }
-        },
-      },
-    }
-  )
+  const supabase = await getSupabaseServerClient()
 
   try {
     // Delete session from database
@@ -116,7 +75,13 @@ export async function DELETE(request: NextRequest) {
       message: 'Session deleted successfully',
     })
 
-    response.cookies.delete('session_token')
+    response.cookies.set('session_token', '', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 0,
+      path: '/',
+    })
 
     return response
   } catch (error) {

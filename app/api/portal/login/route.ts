@@ -1,6 +1,5 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+import { getSupabaseServerClient } from '@/lib/supabase-server'
 import { comparePassword } from '@/lib/password'
 import { z } from 'zod'
 
@@ -29,29 +28,7 @@ export async function POST(request: NextRequest) {
     
     const { name, password } = validation.data
 
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              )
-            } catch {
-              // The `setAll` method was called from a Server Component.
-              // This can be ignored if you have middleware refreshing
-              // user sessions.
-            }
-          },
-        },
-      }
-    )
+    const supabase = await getSupabaseServerClient()
 
     // Verify employee/manager credentials using name - allow all non-admin roles
     const { data: userData, error: userError } = await supabase
@@ -84,24 +61,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Create session in database with minimal required data
-    const sessionUrl = new URL('/api/sessions', request.nextUrl.origin).toString()
-    const sessionResponse = await fetch(
-      sessionUrl,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: user.id,
-          role: user.role,
-          userName: user.name,
-        }),
-      }
-    )
+    const { randomUUID } = await import('crypto')
+    const token = randomUUID()
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
 
-    if (!sessionResponse.ok) throw new Error('Failed to create session')
-    const sessionData = await sessionResponse.json()
+    const { error: sessionError } = await supabase
+      .from('sessions')
+      .insert({
+        user_id: user.id,
+        token,
+        role: user.role,
+        user_name: user.name,
+        expires_at: expiresAt.toISOString(),
+      })
+
+    if (sessionError) {
+      throw new Error(`Failed to create session: ${sessionError.message}`)
+    }
 
     // Return user data with token in secure HttpOnly cookie
     const { password: _, ...userWithoutPassword } = user
@@ -112,10 +88,10 @@ export async function POST(request: NextRequest) {
     })
 
     // Set HttpOnly secure cookie (cannot be accessed by JavaScript)
-    response.cookies.set('session_token', sessionData.token, {
+    response.cookies.set('session_token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: true,
+      sameSite: 'none',
       maxAge: 30 * 24 * 60 * 60, // 30 days in seconds
       path: '/',
     })

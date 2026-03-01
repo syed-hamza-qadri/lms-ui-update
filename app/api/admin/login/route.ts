@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { getSupabaseServerClient } from '@/lib/supabase-server'
 import { z } from 'zod'
 
 // Admin password from server-only environment variable (NOT NEXT_PUBLIC_*)
@@ -37,27 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create backend session for admin
-    const cookieStore = await cookies()
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll()
-          },
-          setAll(cookiesToSet) {
-            try {
-              cookiesToSet.forEach(({ name, value, options }) =>
-                cookieStore.set(name, value, options)
-              )
-            } catch {
-              // Ignored
-            }
-          },
-        },
-      }
-    )
+    const supabase = await getSupabaseServerClient()
 
     // Check if ANY admin already exists
     const { data: existingAdmins, error: checkError } = await supabase
@@ -97,25 +76,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Create session for admin with minimal required data
-    const sessionUrl = new URL('/api/sessions', request.nextUrl.origin).toString()
-    const sessionResponse = await fetch(
-      sessionUrl,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: adminUser.id,
-          role: 'admin',
-          userName: adminUser.name,
-        }),
-      }
-    )
+    const { randomUUID } = await import('crypto')
+    const token = randomUUID()
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
 
-    if (!sessionResponse.ok) {
-      throw new Error('Failed to create session')
+    const { error: sessionError } = await supabase
+      .from('sessions')
+      .insert({
+        user_id: adminUser.id,
+        token,
+        role: 'admin',
+        user_name: adminUser.name,
+        expires_at: expiresAt.toISOString(),
+      })
+
+    if (sessionError) {
+      throw new Error(`Failed to create session: ${sessionError.message}`)
     }
-
-    const sessionData = await sessionResponse.json()
 
     const response = NextResponse.json({
       message: 'Admin login successful',
@@ -123,10 +100,10 @@ export async function POST(request: NextRequest) {
     })
 
     // Set HttpOnly secure cookie (cannot be accessed by JavaScript)
-    response.cookies.set('session_token', sessionData.token, {
+    response.cookies.set('session_token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: true,
+      sameSite: 'none',
       maxAge: 30 * 24 * 60 * 60, // 30 days in seconds
       path: '/',
     })

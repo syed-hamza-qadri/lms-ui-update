@@ -1,6 +1,5 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+import { getSupabaseServerClient } from '@/lib/supabase-server'
 
 export async function GET(request: NextRequest) {
   // Get token from HttpOnly cookie
@@ -13,27 +12,7 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
-          } catch {
-            // Ignored
-          }
-        },
-      },
-    }
-  )
+  const supabase = await getSupabaseServerClient()
 
   try {
     // Get session - optimized query without JOIN
@@ -44,18 +23,34 @@ export async function GET(request: NextRequest) {
       .single()
 
     if (error || !data) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'Invalid or expired session' },
         { status: 401 }
       )
+      response.cookies.set('session_token', '', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 0,
+        path: '/',
+      })
+      return response
     }
 
     // Check if expired
     if (new Date(data.expires_at) < new Date()) {
-      return NextResponse.json(
+      const response = NextResponse.json(
         { error: 'Session expired' },
         { status: 401 }
       )
+      response.cookies.set('session_token', '', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 0,
+        path: '/',
+      })
+      return response
     }
 
     // Return session info - only essential data for auth/display
@@ -84,27 +79,7 @@ export async function DELETE(request: NextRequest) {
     )
   }
 
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
-          } catch {
-            // Ignored
-          }
-        },
-      },
-    }
-  )
+  const supabase = await getSupabaseServerClient()
 
   try {
     // Delete session
@@ -115,9 +90,19 @@ export async function DELETE(request: NextRequest) {
 
     if (error) throw error
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       message: 'Session deleted',
     })
+
+    response.cookies.set('session_token', '', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+      maxAge: 0,
+      path: '/',
+    })
+
+    return response
   } catch (error) {
     console.error('[v0] Error deleting session:', error)
     return NextResponse.json(
