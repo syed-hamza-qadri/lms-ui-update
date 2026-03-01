@@ -14,7 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
-import { Loader2, Plus, Trash2, ArrowLeft, Key, Edit2, Eye, EyeOff } from 'lucide-react'
+import { Loader2, Plus, Trash2, ArrowLeft, Key, Edit2, Eye, EyeOff, Users, ShieldCheck } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast'
 
 interface User {
@@ -311,29 +311,43 @@ export default function UserManagement() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-background p-8 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <main className="min-h-screen bg-[#fcfcfc] flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-background p-8">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => router.push('/admin')}
-            className="h-10 w-10 p-0"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold text-foreground">Manage Users</h1>
-            <p className="text-muted-foreground mt-2">Create, view, and manage admin, manager, lead generator, and caller accounts</p>
+    <main className="min-h-screen bg-[#fcfcfc] pb-12">
+      {/* Top Navigation Bar */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.push('/admin')}
+              className="h-9 w-9 rounded-xl text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+            <div className="flex items-center gap-3 border-l border-gray-200 pl-4">
+              <div className="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
+                <Users className="w-4 h-4 text-indigo-600" />
+              </div>
+              <h1 className="text-xl font-bold text-gray-900 tracking-tight">Manage Users</h1>
+            </div>
           </div>
+        </div>
+      </header>
+
+      <div className="max-w-6xl mx-auto px-6 mt-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Employees</h2>
+            <p className="text-gray-500 mt-1">Create, view, and manage system access accounts</p>
+          </div>
+          
           <Dialog open={openDialog} onOpenChange={(open) => {
             setOpenDialog(open)
             if (!open) {
@@ -342,46 +356,50 @@ export default function UserManagement() {
             }
           }}>
             <DialogTrigger asChild>
-              <Button className="flex items-center gap-2">
+              <Button className="flex items-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm h-11 px-6">
                 <Plus className="w-4 h-4" />
                 New User
               </Button>
             </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{editingUserId ? 'Edit User' : 'Add New User'}</DialogTitle>
-                <DialogDescription>{editingUserId ? 'Update user information' : 'Create a new user account with appropriate role'}</DialogDescription>
-              </DialogHeader>
+            <DialogContent className="sm:max-w-md rounded-2xl border-0 shadow-2xl p-0 overflow-hidden">
+              <div className="bg-indigo-600 p-6 text-white">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-bold text-white">{editingUserId ? 'Edit User' : 'Add New User'}</DialogTitle>
+                  <DialogDescription className="text-indigo-100">{editingUserId ? 'Update user information' : 'Create a new user account with appropriate role'}</DialogDescription>
+                </DialogHeader>
+              </div>
 
-              <form onSubmit={handleCreateUser} className="space-y-4">
-                <div>
-                  <Label htmlFor="name" className="mb-2 block">Full Name</Label>
+              <form onSubmit={handleCreateUser} className="p-6 space-y-5 bg-white">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-semibold text-gray-700">Full Name</Label>
                   <Input
                     id="name"
                     placeholder="Enter name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="h-11 rounded-xl border-gray-200 focus:ring-indigo-500 focus:border-indigo-500"
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="email" className="mb-2 block">Email</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-semibold text-gray-700">Email</Label>
                   <Input
                     id="email"
                     type="email"
                     placeholder="Enter email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="h-11 rounded-xl border-gray-200 focus:ring-indigo-500 focus:border-indigo-500"
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="role" className="mb-2 block">Role</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="role" className="text-sm font-semibold text-gray-700">Role</Label>
                   <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                    <SelectTrigger id="role">
+                    <SelectTrigger id="role" className="h-11 rounded-xl border-gray-200 focus:ring-indigo-500 focus:border-indigo-500">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="rounded-xl border-gray-200 shadow-xl">
                       <SelectItem value="admin">Admin - Full System Access</SelectItem>
                       <SelectItem value="manager">Manager - Assign Callers & Leads</SelectItem>
                       <SelectItem value="lead_generator">Lead Generator - Create Leads</SelectItem>
@@ -390,7 +408,7 @@ export default function UserManagement() {
                   </Select>
                 </div>
 
-                <Button type="submit" disabled={creating} className="w-full">
+                <Button type="submit" disabled={creating} className="w-full h-11 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white mt-2">
                   {creating ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -406,46 +424,59 @@ export default function UserManagement() {
         </div>
 
         {/* Users Table */}
-        <Card>
+        <Card className="border-gray-200/60 shadow-sm rounded-2xl overflow-hidden bg-white">
           <CardContent className="p-0">
             {users.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No users yet</p>
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                  <Users className="w-8 h-8 text-gray-300" />
+                </div>
+                <p className="text-gray-500 font-medium">No users found</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left px-6 py-3 font-semibold">Name</th>
-                      <th className="text-left px-6 py-3 font-semibold">Email</th>
-                      <th className="text-left px-6 py-3 font-semibold">Role</th>
-                      <th className="text-left px-6 py-3 font-semibold">Created</th>
-                      <th className="text-left px-6 py-3 font-semibold">Actions</th>
+                <table className="w-full text-sm text-left">
+                  <thead className="text-xs text-gray-500 uppercase bg-gray-50/80 border-b border-gray-100">
+                    <tr>
+                      <th className="px-6 py-4 font-semibold tracking-wider">Name</th>
+                      <th className="px-6 py-4 font-semibold tracking-wider">Email</th>
+                      <th className="px-6 py-4 font-semibold tracking-wider">Role</th>
+                      <th className="px-6 py-4 font-semibold tracking-wider">Created</th>
+                      <th className="px-6 py-4 font-semibold tracking-wider text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-gray-100">
                     {users.map((user: any) => (
-                      <tr key={user.id} className="border-b border-border hover:bg-muted/50 transition-colors">
-                        <td className="px-6 py-4 font-medium">{user.name}</td>
-                        <td className="px-6 py-4 text-sm text-muted-foreground">{user.email}</td>
+                      <tr key={user.id} className="hover:bg-gray-50/80 transition-colors group">
                         <td className="px-6 py-4">
-                          <Badge variant="outline">{user.role}</Badge>
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-xs">
+                              {user.name.charAt(0).toUpperCase()}
+                            </div>
+                            <span className="font-semibold text-gray-900">{user.name}</span>
+                          </div>
                         </td>
-                        <td className="px-6 py-4 text-sm text-muted-foreground">
+                        <td className="px-6 py-4 text-gray-500">{user.email}</td>
+                        <td className="px-6 py-4">
+                          <Badge variant="secondary" className="px-2.5 py-1 rounded-md font-medium bg-gray-100 text-gray-700">
+                            {user.role}
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-4 text-gray-500">
                           {new Date(user.created_at).toLocaleDateString()}
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex gap-2">
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <Button
-                              variant="outline"
-                              size="sm"
+                              variant="ghost"
+                              size="icon"
                               onClick={() => handleEditUser(user)}
-                              className="flex items-center gap-1"
+                              className="h-8 w-8 rounded-lg text-gray-500 hover:text-indigo-600 hover:bg-indigo-50"
+                              title="Edit User"
                             >
                               <Edit2 className="w-4 h-4" />
-                              Edit
                             </Button>
+                            
                             <Dialog open={openPasswordDialog && selectedUserId === user.id} onOpenChange={(open) => {
                               setOpenPasswordDialog(open)
                               if (!open) {
@@ -456,26 +487,28 @@ export default function UserManagement() {
                             }}>
                               <DialogTrigger asChild>
                                 <Button
-                                  variant="outline"
-                                  size="sm"
+                                  variant="ghost"
+                                  size="icon"
                                   onClick={() => {
                                     setSelectedUserId(user.id)
                                     setOpenPasswordDialog(true)
                                   }}
-                                  className="flex items-center gap-1"
+                                  className="h-8 w-8 rounded-lg text-gray-500 hover:text-amber-600 hover:bg-amber-50"
+                                  title="Reset Password"
                                 >
                                   <Key className="w-4 h-4" />
-                                  Reset Password
                                 </Button>
                               </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>Update Password</DialogTitle>
-                                  <DialogDescription>Set a new password for {user.name}</DialogDescription>
-                                </DialogHeader>
-                                <form onSubmit={handleUpdatePassword} className="space-y-4">
-                                  <div>
-                                    <Label htmlFor="new-password" className="mb-2 block">New Password</Label>
+                              <DialogContent className="sm:max-w-md rounded-2xl border-0 shadow-2xl p-0 overflow-hidden">
+                                <div className="bg-amber-500 p-6 text-white">
+                                  <DialogHeader>
+                                    <DialogTitle className="text-xl font-bold text-white">Update Password</DialogTitle>
+                                    <DialogDescription className="text-amber-100">Set a new password for {user.name}</DialogDescription>
+                                  </DialogHeader>
+                                </div>
+                                <form onSubmit={handleUpdatePassword} className="p-6 space-y-5 bg-white">
+                                  <div className="space-y-2">
+                                    <Label htmlFor="new-password" className="text-sm font-semibold text-gray-700">New Password</Label>
                                     <div className="relative">
                                       <Input
                                         id="new-password"
@@ -484,12 +517,12 @@ export default function UserManagement() {
                                         value={newPassword}
                                         onChange={(e) => setNewPassword(e.target.value)}
                                         disabled={updatingPassword}
-                                        className="pr-10"
+                                        className="h-11 pr-10 rounded-xl border-gray-200 focus:ring-amber-500 focus:border-amber-500"
                                       />
                                       <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                                       >
                                         {showPassword ? (
                                           <EyeOff className="w-4 h-4" />
@@ -499,7 +532,7 @@ export default function UserManagement() {
                                       </button>
                                     </div>
                                   </div>
-                                  <Button type="submit" disabled={updatingPassword} className="w-full">
+                                  <Button type="submit" disabled={updatingPassword} className="w-full h-11 rounded-xl bg-amber-500 hover:bg-amber-600 text-white mt-2">
                                     {updatingPassword ? (
                                       <>
                                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -512,14 +545,15 @@ export default function UserManagement() {
                                 </form>
                               </DialogContent>
                             </Dialog>
+                            
                             <Button
-                              variant="destructive"
-                              size="sm"
+                              variant="ghost"
+                              size="icon"
                               onClick={() => handleDeleteUser(user.id)}
-                              className="flex items-center gap-1"
+                              className="h-8 w-8 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50"
+                              title="Delete User"
                             >
                               <Trash2 className="w-4 h-4" />
-                              Delete
                             </Button>
                           </div>
                         </td>
@@ -534,17 +568,17 @@ export default function UserManagement() {
 
         {/* Delete Confirmation Dialog */}
         <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
-          <AlertDialogContent>
+          <AlertDialogContent className="rounded-2xl border-0 shadow-2xl">
             <AlertDialogHeader>
-              <AlertDialogTitle>Delete User</AlertDialogTitle>
-              <AlertDialogDescription>
+              <AlertDialogTitle className="text-xl font-bold text-gray-900">Delete User</AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-500">
                 Are you sure you want to delete this user? This action cannot be undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <div className="flex gap-3 justify-end">
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-white hover:bg-destructive/90">
-                Delete
+            <div className="flex gap-3 justify-end mt-4">
+              <AlertDialogCancel className="rounded-xl h-11 border-gray-200 hover:bg-gray-50">Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={confirmDelete} className="rounded-xl h-11 bg-red-600 text-white hover:bg-red-700">
+                Delete User
               </AlertDialogAction>
             </div>
           </AlertDialogContent>

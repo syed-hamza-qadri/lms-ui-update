@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Loader2, LogOut } from 'lucide-react'
+import { Loader2, LogOut, Settings, Users, Activity, BarChart3, Calendar, FileText, ShieldCheck } from 'lucide-react'
 
 interface ActivityLog {
   id: string
@@ -151,11 +151,11 @@ export default function AdminDashboard() {
 
   const getActionColor = (action: string) => {
     const colors: Record<string, string> = {
-      approve: 'bg-green-100 text-green-800',
-      decline: 'bg-red-100 text-red-800',
-      later: 'bg-yellow-100 text-yellow-800',
+      approve: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+      decline: 'bg-rose-100 text-rose-800 border-rose-200',
+      later: 'bg-amber-100 text-amber-800 border-amber-200',
     }
-    return colors[action] || 'bg-gray-100 text-gray-800'
+    return colors[action] || 'bg-slate-100 text-slate-800 border-slate-200'
   }
 
   const handleLogout = async () => {
@@ -174,17 +174,17 @@ export default function AdminDashboard() {
 
   if (sessionLoading || !session) {
     return (
-      <main className="min-h-screen bg-background p-8 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <main className="min-h-screen bg-[#fcfcfc] flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
       </main>
     )
   }
 
   if (session.user_role !== 'admin') {
     return (
-      <main className="min-h-screen bg-background p-8 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-destructive">Unauthorized access</p>
+      <main className="min-h-screen bg-[#fcfcfc] flex items-center justify-center">
+        <div className="text-center p-8 bg-white rounded-2xl shadow-sm border border-gray-100">
+          <p className="text-red-600 font-medium">Unauthorized access</p>
         </div>
       </main>
     )
@@ -192,131 +192,164 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-background p-8 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <main className="min-h-screen bg-[#fcfcfc] flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-indigo-600" />
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-background p-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
-            <p className="text-muted-foreground mt-2">Monitor system activity and manage users</p>
+    <main className="min-h-screen bg-[#fcfcfc] pb-12">
+      {/* Top Navigation Bar */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
+              <ShieldCheck className="w-5 h-5 text-white" />
+            </div>
+            <h1 className="text-xl font-bold text-gray-900 tracking-tight">Admin Dashboard</h1>
           </div>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-3">
             <Button
               variant="outline"
-              onClick={() => {
-                router.push('/admin/setup')
-              }}
-              className="flex items-center gap-2"
+              onClick={() => router.push('/admin/setup')}
+              className="hidden md:flex items-center gap-2 rounded-xl border-gray-200 hover:bg-gray-50 text-gray-700"
             >
+              <Settings className="w-4 h-4" />
               Setup Data
             </Button>
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={handleLogout}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 rounded-xl text-gray-600 hover:text-red-600 hover:bg-red-50"
             >
               <LogOut className="w-4 h-4" />
-              Logout
+              <span className="hidden sm:inline">Logout</span>
             </Button>
           </div>
         </div>
+      </header>
 
+      <div className="max-w-7xl mx-auto px-6 mt-8">
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Total Leads</CardTitle>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden relative group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <Users className="w-16 h-16 text-blue-600" />
+            </div>
+            <CardHeader className="pb-2 pt-6 px-6">
+              <CardTitle className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Total Leads</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{stats.total_leads}</div>
-              <p className="text-xs text-muted-foreground mt-1">In system</p>
+            <CardContent className="px-6 pb-6">
+              <div className="text-4xl font-black text-gray-900">{stats.total_leads}</div>
+              <p className="text-sm text-gray-500 mt-2 font-medium flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-blue-500" /> In system
+              </p>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Total Responses</CardTitle>
+          <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden relative group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <BarChart3 className="w-16 h-16 text-indigo-600" />
+            </div>
+            <CardHeader className="pb-2 pt-6 px-6">
+              <CardTitle className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Total Responses</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{stats.total_responses}</div>
-              <p className="text-xs text-muted-foreground mt-1">Actions taken</p>
+            <CardContent className="px-6 pb-6">
+              <div className="text-4xl font-black text-gray-900">{stats.total_responses}</div>
+              <p className="text-sm text-gray-500 mt-2 font-medium flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-indigo-500" /> Actions taken
+              </p>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">Active Users (24h)</CardTitle>
+          <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden relative group">
+            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+              <Activity className="w-16 h-16 text-emerald-600" />
+            </div>
+            <CardHeader className="pb-2 pt-6 px-6">
+              <CardTitle className="text-sm font-semibold text-gray-500 uppercase tracking-wider">Active Users (24h)</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{stats.active_users}</div>
-              <p className="text-xs text-muted-foreground mt-1">Employees active</p>
+            <CardContent className="px-6 pb-6">
+              <div className="text-4xl font-black text-gray-900">{stats.active_users}</div>
+              <p className="text-sm text-gray-500 mt-2 font-medium flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-emerald-500" /> Employees active
+              </p>
             </CardContent>
           </Card>
         </div>
 
         {/* Tabs */}
         <Tabs defaultValue="activity" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="activity">Activity Log</TabsTrigger>
-            <TabsTrigger value="users">Manage Users</TabsTrigger>
+          <TabsList className="grid w-full max-w-md grid-cols-2 p-1 bg-gray-100/80 rounded-xl mb-8">
+            <TabsTrigger value="activity" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-medium">
+              Activity Log
+            </TabsTrigger>
+            <TabsTrigger value="users" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-indigo-600 data-[state=active]:shadow-sm font-medium">
+              Manage Users
+            </TabsTrigger>
           </TabsList>
 
           {/* Activity Tab */}
-          <TabsContent value="activity" className="space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>Employee actions on leads</CardDescription>
+          <TabsContent value="activity" className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <Card className="border-gray-200/60 shadow-sm rounded-2xl overflow-hidden bg-white">
+              <CardHeader className="border-b border-gray-100 bg-gray-50/50 px-6 py-5">
+                <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-indigo-500" />
+                  Recent Activity
+                </CardTitle>
+                <CardDescription className="text-gray-500">Employee actions on leads across the system</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-0">
                 {activities.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">No activity yet</p>
+                  <div className="flex flex-col items-center justify-center py-16 text-center">
+                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                      <Activity className="w-8 h-8 text-gray-300" />
+                    </div>
+                    <p className="text-gray-500 font-medium">No activity recorded yet</p>
+                  </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="divide-y divide-gray-100">
                     {activities.map((activity: any) => (
                       <div
                         key={activity.id}
-                        className="flex items-start justify-between border-b border-border pb-4 last:border-b-0 cursor-pointer hover:bg-muted/50 p-2 rounded transition-colors"
+                        className="flex flex-col sm:flex-row sm:items-start justify-between p-6 cursor-pointer hover:bg-gray-50 transition-colors group"
                         onClick={() => {
                           setSelectedActivity(activity)
                           setShowDialog(true)
                         }}
                       >
                         <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{activity.user_name}</span>
-                            <Badge variant="secondary" className={getActionColor(activity.action_type)}>
+                          <div className="flex items-center gap-3 mb-2">
+                            <span className="font-semibold text-gray-900">{activity.user_name}</span>
+                            <Badge variant="outline" className={`px-2.5 py-0.5 font-medium border ${getActionColor(activity.action_type)}`}>
                               {activity.action_type}
                             </Badge>
                           </div>
-                          <p className="text-sm text-muted-foreground mt-1">
-                            Lead: <span className="font-medium">{activity.lead_name}</span>
+                          <p className="text-sm text-gray-600 mb-2">
+                            Lead: <span className="font-medium text-gray-900">{activity.lead_name}</span>
                           </p>
                           {activity.description && (
-                            <p className="text-sm text-foreground mt-1">{activity.description}</p>
+                            <p className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100 inline-block">
+                              {activity.description}
+                            </p>
                           )}
                           {activity.action_type === 'later' && activity.scheduled_for && (
-                            <p className="text-sm text-foreground mt-2 font-medium">
-                              📅 Scheduled for: {new Date(activity.scheduled_for).toLocaleDateString()}
+                            <div className="flex items-center gap-1.5 mt-3 text-sm font-medium text-amber-700 bg-amber-50 px-3 py-1.5 rounded-lg w-fit">
+                              <Calendar className="w-4 h-4" />
+                              Scheduled for: {new Date(activity.scheduled_for).toLocaleDateString()}
                               {(() => {
                                 const scheduledDate = new Date(activity.scheduled_for)
                                 const today = new Date()
                                 today.setHours(0, 0, 0, 0)
                                 scheduledDate.setHours(0, 0, 0, 0)
                                 const daysRemaining = Math.ceil((scheduledDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-                                return daysRemaining > 0 ? ` (${daysRemaining} days remaining)` : ' (due today)'
+                                return daysRemaining > 0 ? <span className="opacity-75">({daysRemaining} days left)</span> : <span className="text-red-600 font-bold">(due today)</span>
                               })()}
-                            </p>
+                            </div>
                           )}
                         </div>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-xs font-medium text-gray-400 mt-4 sm:mt-0 whitespace-nowrap group-hover:text-gray-500 transition-colors">
                           {new Date(activity.created_at).toLocaleDateString()} at{' '}
-                          {new Date(activity.created_at).toLocaleTimeString()}
+                          {new Date(activity.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </div>
                       </div>
                     ))}
@@ -326,25 +359,27 @@ export default function AdminDashboard() {
               
               {/* Pagination Controls */}
               {totalLogsCount > logsPerPage && (
-                <div className="flex items-center justify-between border-t border-border p-4">
-                  <div className="text-sm text-muted-foreground">
-                    Showing {currentPage * logsPerPage + 1} to {Math.min((currentPage + 1) * logsPerPage, totalLogsCount)} of {totalLogsCount} logs
+                <div className="flex flex-col sm:flex-row items-center justify-between border-t border-gray-100 p-4 bg-gray-50/50 gap-4">
+                  <div className="text-sm font-medium text-gray-500">
+                    Showing <span className="text-gray-900">{currentPage * logsPerPage + 1}</span> to <span className="text-gray-900">{Math.min((currentPage + 1) * logsPerPage, totalLogsCount)}</span> of <span className="text-gray-900">{totalLogsCount}</span> logs
                   </div>
                   <div className="flex gap-2">
                     <Button
                       variant="outline"
                       size="sm"
+                      className="rounded-lg border-gray-200"
                       onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
                       disabled={currentPage === 0}
                     >
                       Previous
                     </Button>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm">Page {currentPage + 1} of {Math.ceil(totalLogsCount / logsPerPage)}</span>
+                    <div className="flex items-center px-3 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg">
+                      Page {currentPage + 1} of {Math.ceil(totalLogsCount / logsPerPage)}
                     </div>
                     <Button
                       variant="outline"
                       size="sm"
+                      className="rounded-lg border-gray-200"
                       onClick={() => setCurrentPage(currentPage + 1)}
                       disabled={(currentPage + 1) * logsPerPage >= totalLogsCount}
                     >
@@ -357,32 +392,50 @@ export default function AdminDashboard() {
           </TabsContent>
 
           {/* Users Tab */}
-          <TabsContent value="users">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0">
+          <TabsContent value="users" className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <Card className="border-gray-200/60 shadow-sm rounded-2xl overflow-hidden bg-white">
+              <CardHeader className="flex flex-row items-center justify-between border-b border-gray-100 bg-gray-50/50 px-6 py-5">
                 <div>
-                  <CardTitle>Employees</CardTitle>
-                  <CardDescription>Manage system users</CardDescription>
+                  <CardTitle className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <Users className="w-5 h-5 text-indigo-500" />
+                    Employees
+                  </CardTitle>
+                  <CardDescription className="text-gray-500 mt-1">Manage system users and their roles</CardDescription>
                 </div>
-                <Button onClick={() => router.push('/admin/users')}>
+                <Button 
+                  onClick={() => router.push('/admin/users')}
+                  className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm"
+                >
                   Manage Users
                 </Button>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-0">
                 {users.length === 0 ? (
-                  <p className="text-center text-muted-foreground py-8">No users yet</p>
+                  <div className="flex flex-col items-center justify-center py-16 text-center">
+                    <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                      <Users className="w-8 h-8 text-gray-300" />
+                    </div>
+                    <p className="text-gray-500 font-medium">No users found</p>
+                  </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="divide-y divide-gray-100">
                     {users.map((user: any) => (
                       <div
                         key={user.id}
-                        className="flex items-center justify-between border-b border-border pb-4 last:border-b-0"
+                        className="flex items-center justify-between p-6 hover:bg-gray-50 transition-colors"
                       >
-                        <div>
-                          <p className="font-medium">{user.name}</p>
-                          <p className="text-sm text-muted-foreground">{user.email}</p>
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold text-sm">
+                            {user.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-900">{user.name}</p>
+                            <p className="text-sm text-gray-500">{user.email}</p>
+                          </div>
                         </div>
-                        <Badge variant="outline">{user.role}</Badge>
+                        <Badge variant="secondary" className="px-3 py-1 rounded-full font-medium bg-gray-100 text-gray-700 hover:bg-gray-200">
+                          {user.role}
+                        </Badge>
                       </div>
                     ))}
                   </div>
@@ -395,39 +448,48 @@ export default function AdminDashboard() {
 
       {/* Activity Details Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Activity Details</DialogTitle>
-            <DialogDescription>Complete information about this activity</DialogDescription>
-          </DialogHeader>
+        <DialogContent className="max-w-md rounded-2xl p-0 overflow-hidden border-0 shadow-2xl">
+          <div className="bg-indigo-600 p-6 text-white">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-bold text-white">Activity Details</DialogTitle>
+              <DialogDescription className="text-indigo-100">Complete information about this action</DialogDescription>
+            </DialogHeader>
+          </div>
+          
           {selectedActivity && (
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Employee</label>
-                <p className="text-foreground font-medium">{selectedActivity.user_name}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Lead</label>
-                <p className="text-foreground font-medium">{selectedActivity.lead_name}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Action</label>
-                <div className="mt-1">
-                  <Badge className={getActionColor(selectedActivity.action_type)}>
-                    {selectedActivity.action_type}
-                  </Badge>
+            <div className="p-6 space-y-5 bg-white">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Employee</label>
+                  <p className="text-gray-900 font-medium">{selectedActivity.user_name}</p>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Action</label>
+                  <div>
+                    <Badge className={`px-2.5 py-0.5 font-medium border ${getActionColor(selectedActivity.action_type)}`}>
+                      {selectedActivity.action_type}
+                    </Badge>
+                  </div>
                 </div>
               </div>
+              
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Lead</label>
+                <p className="text-gray-900 font-medium p-3 bg-gray-50 rounded-xl border border-gray-100">{selectedActivity.lead_name}</p>
+              </div>
+              
               {selectedActivity.description && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Notes</label>
-                  <p className="text-foreground mt-1">{selectedActivity.description}</p>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Notes</label>
+                  <p className="text-gray-700 p-3 bg-gray-50 rounded-xl border border-gray-100 text-sm leading-relaxed">{selectedActivity.description}</p>
                 </div>
               )}
+              
               {selectedActivity.action_type === 'later' && selectedActivity.scheduled_for && (
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Scheduled For</label>
-                  <p className="text-foreground font-medium">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Scheduled For</label>
+                  <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-xl border border-amber-100 text-amber-900 font-medium">
+                    <Calendar className="w-5 h-5 text-amber-600" />
                     {new Date(selectedActivity.scheduled_for).toLocaleDateString()}
                     {(() => {
                       const scheduledDate = new Date(selectedActivity.scheduled_for)
@@ -435,19 +497,21 @@ export default function AdminDashboard() {
                       today.setHours(0, 0, 0, 0)
                       scheduledDate.setHours(0, 0, 0, 0)
                       const daysRemaining = Math.ceil((scheduledDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
-                      return daysRemaining > 0 ? ` (${daysRemaining} days remaining)` : ' (due today)'
+                      return daysRemaining > 0 ? <span className="text-amber-600 text-sm">({daysRemaining} days left)</span> : <span className="text-red-600 text-sm font-bold">(due today)</span>
                     })()}
-                  </p>
+                  </div>
                 </div>
               )}
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Recorded At</label>
-                <p className="text-foreground">
+              
+              <div className="space-y-1 pt-2 border-t border-gray-100">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Recorded At</label>
+                <p className="text-gray-600 text-sm">
                   {new Date(selectedActivity.created_at).toLocaleDateString()} at{' '}
                   {new Date(selectedActivity.created_at).toLocaleTimeString()}
                 </p>
               </div>
-              <Button onClick={() => setShowDialog(false)} className="w-full mt-4">
+              
+              <Button onClick={() => setShowDialog(false)} className="w-full mt-6 rounded-xl h-12 bg-gray-900 hover:bg-gray-800 text-white">
                 Close
               </Button>
             </div>
