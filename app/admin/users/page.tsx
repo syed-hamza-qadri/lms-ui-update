@@ -4,7 +4,7 @@ import React from "react"
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getSupabaseClient } from '@/lib/supabase-client'
+import { useSupabaseClient } from '@/lib/supabase-context'
 import { useSession } from '@/lib/session'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -29,6 +29,7 @@ export default function UserManagement() {
   const router = useRouter()
   const { toast } = useToast()
   const { session, loading: sessionLoading } = useSession()
+  const supabase = useSupabaseClient()
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
@@ -42,7 +43,6 @@ export default function UserManagement() {
   const [showPassword, setShowPassword] = useState(false)
   const [updatingPassword, setUpdatingPassword] = useState(false)
   const [editingUserId, setEditingUserId] = useState<string | null>(null)
-  const supabase = getSupabaseClient()
 
   useEffect(() => {
     if (!sessionLoading && !session) {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { getSupabaseClient } from '@/lib/supabase-client'
+import { useSupabaseClient } from '@/lib/supabase-context'
 import { useToast } from '@/hooks/use-toast'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -47,6 +47,7 @@ export default function LeadDetail() {
   const router = useRouter()
   const { toast } = useToast()
   const leadId = params.id as string
+  const supabase = useSupabaseClient()
   const [lead, setLead] = useState<Lead | null>(null)
   const [loading, setLoading] = useState(true)
   const [responding, setResponding] = useState(false)

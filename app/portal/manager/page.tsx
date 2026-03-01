@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getSupabaseClient } from '@/lib/supabase-client'
+import { useSupabaseClient } from '@/lib/supabase-context'
 import { useSession } from '@/lib/session'
 import { useDebounce } from '@/lib/debounce'
 import {
@@ -90,7 +90,7 @@ interface LeadGeneratorPerformance {
 export default function ManagerPortal() {
   const router = useRouter()
   const { toast } = useToast()
-  const supabase = getSupabaseClient()
+  const supabase = useSupabaseClient()
   const { session, loading: sessionLoading } = useSession()
 
   const [loading, setLoading] = useState<boolean>(true)

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getSupabaseClient } from '@/lib/supabase-client'
+import { useSupabaseClient } from '@/lib/supabase-context'
 import { useSession } from '@/lib/session'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -34,6 +34,7 @@ interface User {
 export default function AdminDashboard() {
   const router = useRouter()
   const { session, loading: sessionLoading } = useSession()
+  const supabase = useSupabaseClient()
   const [activities, setActivities] = useState<ActivityLog[]>([])
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
@@ -43,7 +44,6 @@ export default function AdminDashboard() {
   const [currentPage, setCurrentPage] = useState(0)
   const [totalLogsCount, setTotalLogsCount] = useState(0)
   const logsPerPage = 20
-  const supabase = getSupabaseClient()
 
   const fetchData = async () => {
     try {

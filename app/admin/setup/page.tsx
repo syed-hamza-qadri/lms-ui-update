@@ -3,7 +3,7 @@
 import React from "react"
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getSupabaseClient } from '@/lib/supabase-client'
+import { useSupabaseClient } from '@/lib/supabase-context'
 import { useSession } from '@/lib/session'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -45,7 +45,7 @@ interface Lead {
 export default function SetupPage() {
   const router = useRouter()
   const { toast } = useToast()
-  const supabase = getSupabaseClient()
+  const supabase = useSupabaseClient()
   const { session, loading: sessionLoading } = useSession()
 
   // Niche States

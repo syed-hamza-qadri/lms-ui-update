@@ -1,28 +1,28 @@
 import { createBrowserClient } from '@supabase/ssr'
 
-let supabaseClient: ReturnType<typeof createBrowserClient> | null = null
-
-// Ensure singleton pattern with browser context check
-function createClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!url || !key) {
-    throw new Error('Missing Supabase environment variables')
-  }
-
-  return createBrowserClient(url, key)
-}
-
+/**
+ * @deprecated Use `useSupabaseClient()` hook from @/lib/supabase-context instead
+ * This function is kept for backward compatibility but may create multiple instances
+ * 
+ * In client components, import and use:
+ * import { useSupabaseClient } from '@/lib/supabase-context'
+ * const supabase = useSupabaseClient()
+ */
 export function getSupabaseClient() {
-  // Only create once per browser session
   if (typeof window === 'undefined') {
-    return createClient()
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+    if (!url || !key) {
+      throw new Error('Missing Supabase environment variables')
+    }
+
+    return createBrowserClient(url, key)
   }
 
-  if (!supabaseClient) {
-    supabaseClient = createClient()
-  }
-
-  return supabaseClient
+  throw new Error(
+    'getSupabaseClient() should not be called in the browser. ' +
+    'Use useSupabaseClient() hook from @/lib/supabase-context instead.'
+  )
 }
+

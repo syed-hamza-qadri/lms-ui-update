@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { getSupabaseClient } from '@/lib/supabase-client'
+import { useSupabaseClient } from '@/lib/supabase-context'
 import { useToast } from '@/hooks/use-toast'
 import { wasLeadPreviouslyScheduled, resetCorrectionStatus, getCorrectionStatusInfo } from '@/lib/auth'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -45,7 +45,7 @@ export default function LeadList() {
   const [defaultTab, setDefaultTab] = useState('unassigned')
   const [performanceOpen, setPerformanceOpen] = useState(false)
   const [performance, setPerformance] = useState({ approved: 0, declined: 0, scheduled: 0, pending: 0, wrong: 0, corrected: 0 })
-  const supabase = getSupabaseClient()
+  const supabase = useSupabaseClient()
 
   // Check for tab query parameter
   useEffect(() => {

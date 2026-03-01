@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { getSupabaseClient } from '@/lib/supabase-client'
+import { useSupabaseClient } from '@/lib/supabase-context'
 import { useSession } from '@/lib/session'
 import { getCallerLeads, getCallerNiches, getCallerCities } from '@/lib/auth'
 import { useDebounce } from '@/lib/debounce'
@@ -42,7 +42,7 @@ interface CityData {
 export default function CallerPortal() {
   const router = useRouter()
   const { toast } = useToast()
-  const supabase = getSupabaseClient()
+  const supabase = useSupabaseClient()
   const { session, loading: sessionLoading } = useSession()
 
   const [loading, setLoading] = useState(true)
