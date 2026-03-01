@@ -1,17 +1,15 @@
 // lib/auth.ts - Role-based authorization utilities
-import { createClient } from '@supabase/supabase-js'
+// All functions accept a supabase client parameter to avoid creating multiple GoTrueClient instances.
+// The caller must pass the singleton client obtained from useSupabaseClient().
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 export type UserRole = 'admin' | 'manager' | 'caller' | 'lead_generator'
 
 /**
  * Check if user has specific role
  */
-export async function hasRole(userId: string, role: UserRole): Promise<boolean> {
+export async function hasRole(supabase: SupabaseClient, userId: string, role: UserRole): Promise<boolean> {
   const { data, error } = await supabase
     .from('users')
     .select('role')
@@ -25,7 +23,7 @@ export async function hasRole(userId: string, role: UserRole): Promise<boolean> 
 /**
  * Check if user has any of the specified roles
  */
-export async function hasAnyRole(userId: string, roles: UserRole[]): Promise<boolean> {
+export async function hasAnyRole(supabase: SupabaseClient, userId: string, roles: UserRole[]): Promise<boolean> {
   const { data, error } = await supabase
     .from('users')
     .select('role')
@@ -39,7 +37,7 @@ export async function hasAnyRole(userId: string, roles: UserRole[]): Promise<boo
 /**
  * Get user's role
  */
-export async function getUserRole(userId: string): Promise<UserRole | null> {
+export async function getUserRole(supabase: SupabaseClient, userId: string): Promise<UserRole | null> {
   const { data, error } = await supabase
     .from('users')
     .select('role')
@@ -54,6 +52,7 @@ export async function getUserRole(userId: string): Promise<UserRole | null> {
  * Check if manager has access to caller
  */
 export async function managerHasCallerAccess(
+  supabase: SupabaseClient,
   managerId: string,
   callerId: string
 ): Promise<boolean> {
@@ -71,7 +70,7 @@ export async function managerHasCallerAccess(
 /**
  * Get all callers for a manager (with optimization)
  */
-export async function getManagerCallers(managerId: string) {
+export async function getManagerCallers(supabase: SupabaseClient, managerId: string) {
   const { data, error } = await supabase
     .from('user_assignments')
     .select(`
@@ -99,7 +98,7 @@ export async function getManagerCallers(managerId: string) {
 /**
  * Get all niches for a caller
  */
-export async function getCallerNiches(callerId: string) {
+export async function getCallerNiches(supabase: SupabaseClient, callerId: string) {
   const { data, error } = await supabase
     .from('niche_assignments')
     .select(`
@@ -127,7 +126,7 @@ export async function getCallerNiches(callerId: string) {
 /**
  * Get all cities for a caller
  */
-export async function getCallerCities(callerId: string) {
+export async function getCallerCities(supabase: SupabaseClient, callerId: string) {
   const { data, error } = await supabase
     .from('city_assignments')
     .select(`
@@ -155,7 +154,7 @@ export async function getCallerCities(callerId: string) {
 /**
  * Get all leads for a caller (with pagination)
  */
-export async function getCallerLeads(callerId: string) {
+export async function getCallerLeads(supabase: SupabaseClient, callerId: string) {
   const { data, error } = await supabase
     .from('city_assignments')
     .select('city_id')
@@ -180,6 +179,7 @@ export async function getCallerLeads(callerId: string) {
  * Assign caller to manager
  */
 export async function assignCallerToManager(
+  supabase: SupabaseClient,
   managerId: string,
   callerId: string
 ): Promise<boolean> {
@@ -198,6 +198,7 @@ export async function assignCallerToManager(
  * Unassign caller from manager
  */
 export async function unassignCallerFromManager(
+  supabase: SupabaseClient,
   managerId: string,
   callerId: string
 ): Promise<boolean> {
@@ -214,6 +215,7 @@ export async function unassignCallerFromManager(
  * Assign niche to caller (fast - no authorization check needed, manager is already authenticated)
  */
 export async function assignNicheToCaller(
+  supabase: SupabaseClient,
   callerId: string,
   nicheId: string,
   assignedBy: string
@@ -233,6 +235,7 @@ export async function assignNicheToCaller(
  * Unassign niche from caller
  */
 export async function unassignNicheFromCaller(
+  supabase: SupabaseClient,
   callerId: string,
   nicheId: string
 ): Promise<boolean> {
@@ -249,6 +252,7 @@ export async function unassignNicheFromCaller(
  * Assign city to caller (fast - no authorization check needed, manager is already authenticated)
  */
 export async function assignCityToCaller(
+  supabase: SupabaseClient,
   callerId: string,
   cityId: string,
   assignedBy: string
@@ -268,6 +272,7 @@ export async function assignCityToCaller(
  * Unassign city from caller
  */
 export async function unassignCityFromCaller(
+  supabase: SupabaseClient,
   callerId: string,
   cityId: string
 ): Promise<boolean> {
@@ -285,7 +290,7 @@ export async function unassignCityFromCaller(
  * Returns true if there's a 'scheduled' action in lead_responses for this lead
  * This persists even after the scheduled date passes and status becomes 'unassigned'
  */
-export async function wasLeadPreviouslyScheduled(leadId: string): Promise<boolean> {
+export async function wasLeadPreviouslyScheduled(supabase: SupabaseClient, leadId: string): Promise<boolean> {
   const { data, error } = await supabase
     .from('lead_responses')
     .select('id')
@@ -301,9 +306,9 @@ export async function wasLeadPreviouslyScheduled(leadId: string): Promise<boolea
  * Get the display status for a lead accounting for Later - Unassigned
  * Returns { status, wasScheduled } to help with UI rendering
  */
-export async function getLeadDisplayStatus(leadId: string, currentStatus: string) {
+export async function getLeadDisplayStatus(supabase: SupabaseClient, leadId: string, currentStatus: string) {
   if (currentStatus === 'unassigned') {
-    const wasScheduled = await wasLeadPreviouslyScheduled(leadId)
+    const wasScheduled = await wasLeadPreviouslyScheduled(supabase, leadId)
     return {
       status: currentStatus,
       wasScheduled,
@@ -323,6 +328,7 @@ export async function getLeadDisplayStatus(leadId: string, currentStatus: string
  * Creates a record in lead_corrections table and updates lead status
  */
 export async function sendLeadForCorrection(
+  supabase: SupabaseClient,
   leadId: string,
   requestedByUserId: string,
   requestedByUserName: string,
@@ -425,7 +431,7 @@ export async function sendLeadForCorrection(
  * Get all pending corrections for leads created by a user (lead-generator)
  * Used to show corrections in lead-generator portal
  */
-export async function getPendingCorrectionsForLeadGenerator(leadGeneratorId: string) {
+export async function getPendingCorrectionsForLeadGenerator(supabase: SupabaseClient, leadGeneratorId: string) {
   try {
     if (!leadGeneratorId) return []
 
@@ -468,7 +474,7 @@ export async function getPendingCorrectionsForLeadGenerator(leadGeneratorId: str
 /**
  * Get a specific correction with its lead details
  */
-export async function getCorrectionDetails(correctionId: string) {
+export async function getCorrectionDetails(supabase: SupabaseClient, correctionId: string) {
   const { data, error } = await supabase
     .from('lead_corrections')
     .select(`
@@ -493,10 +499,10 @@ export async function getCorrectionDetails(correctionId: string) {
  * Complete a correction (lead-generator confirmed changes)
  * Marks correction as completed and updates lead with corrected status
  */
-export async function completeLeadCorrection(correctionId: string): Promise<{ success: boolean; error?: string }> {
+export async function completeLeadCorrection(supabase: SupabaseClient, correctionId: string): Promise<{ success: boolean; error?: string }> {
   try {
     // Get correction details to know which lead to update
-    const correction = await getCorrectionDetails(correctionId)
+    const correction = await getCorrectionDetails(supabase, correctionId)
     if (!correction) {
       return { 
         success: false, 
@@ -554,7 +560,7 @@ export async function completeLeadCorrection(correctionId: string): Promise<{ su
 /**
  * Check if a lead has any pending corrections
  */
-export async function hasPendingCorrection(leadId: string): Promise<boolean> {
+export async function hasPendingCorrection(supabase: SupabaseClient, leadId: string): Promise<boolean> {
   const { data, error } = await supabase
     .from('lead_corrections')
     .select('id')
@@ -569,7 +575,7 @@ export async function hasPendingCorrection(leadId: string): Promise<boolean> {
 /**
  * Get pending correction for a specific lead
  */
-export async function getPendingCorrectionForLead(leadId: string) {
+export async function getPendingCorrectionForLead(supabase: SupabaseClient, leadId: string) {
   const { data, error } = await supabase
     .from('lead_corrections')
     .select('*')
@@ -587,7 +593,7 @@ export async function getPendingCorrectionForLead(leadId: string) {
  * Get correction status information for a lead
  * Returns badge type and message for UI display
  */
-export async function getCorrectionStatusInfo(leadId: string): Promise<{
+export async function getCorrectionStatusInfo(supabase: SupabaseClient, leadId: string): Promise<{
   hasCorrection: boolean
   status: 'pending' | 'corrected' | null
   badge: 'wrong' | 'corrected' | null
@@ -623,7 +629,7 @@ export async function getCorrectionStatusInfo(leadId: string): Promise<{
 
     // If pending correction, get the correction details
     if (lead.correction_status === 'pending') {
-      const pendingCorrection = await getPendingCorrectionForLead(leadId)
+      const pendingCorrection = await getPendingCorrectionForLead(supabase, leadId)
       return {
         hasCorrection: true,
         status: 'pending',
@@ -663,7 +669,7 @@ export async function getCorrectionStatusInfo(leadId: string): Promise<{
  * Reset correction status for a lead (after caller has processed corrected lead)
  * Called when caller takes action on a corrected lead
  */
-export async function resetCorrectionStatus(leadId: string): Promise<boolean> {
+export async function resetCorrectionStatus(supabase: SupabaseClient, leadId: string): Promise<boolean> {
   try {
     const { error } = await supabase
       .from('leads')
